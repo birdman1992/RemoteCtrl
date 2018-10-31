@@ -13,7 +13,7 @@ class SpdDataGram : public QObject
     Q_OBJECT
 public:
     explicit SpdDataGram(QObject *parent = NULL);
-    void appendData(QString addr, QByteArray dataGram);
+    void appendData(QString addr, quint16 port, QByteArray dataGram);
     QByteArray check_version();
     QByteArray find_ping();
     QByteArray find_pang(QStringList netParams);
@@ -26,7 +26,7 @@ private:
     QByteArray creatDataGram(QStringList cmds);
 
 signals:
-    void newDataGram(QString addr, QByteArray dataGram);
+    void newDataGram(QString addr, quint16 port, QByteArray dataGram);
 
 public slots:
 };

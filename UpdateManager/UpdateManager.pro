@@ -28,13 +28,18 @@ SOURCES += \
         widget.cpp \
     updatemanager.cpp \
     updateitem.cpp \
-    spddatagram.cpp
+    spddatagram.cpp \
+    remoteclient.cpp \
+    remoteconfig.cpp
 
 HEADERS += \
         widget.h \
     updatemanager.h \
     updateitem.h \
-    spddatagram.h
+    spddatagram.h \
+    remoteclient.h \
+    remoteconfig.h
 
 FORMS += \
-        widget.ui
+        widget.ui \
+    remoteconfig.ui

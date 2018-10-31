@@ -33,7 +33,7 @@ public slots:
 
 private slots:
     void recvSktMsg();
-    void newDataGram(QString addr, QByteArray dataGram);
+    void newDataGram(QString addr, quint16 port, QByteArray dataGram);
 };
 
 #endif // UPDATACLIENT_H

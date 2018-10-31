@@ -10,7 +10,7 @@ public:
     static ConfigManager* manager();
 
 private:
-    explicit ConfigManager(QObject *parent = nullptr);
+    explicit ConfigManager(QObject *parent = NULL);
     static ConfigManager* m;
 
 signals:

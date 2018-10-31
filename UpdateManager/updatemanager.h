@@ -6,8 +6,10 @@
 #include <QList>
 #include <QStringList>
 #include <QByteArray>
+#include <QMap>
 #include "updateitem.h"
 #include "spddatagram.h"
+#include "remoteclient.h"
 
 
 class UpdateManager : public QObject
@@ -16,20 +18,24 @@ class UpdateManager : public QObject
 public:
     explicit UpdateManager(QObject *parent = NULL);
     QList<UpdateItem*> list_socket;
+    void setRemoteNetwork(RemoteClient* c);
 
 private:
     QStringList list_address;
     QUdpSocket* skt;
     SpdDataGram* dataManager;
+    QMap< QString, RemoteClient*> list_client;
 
     void readDeviceList();
     void creatDevices(QStringList list);
+    void msgPang(QString addr, quint16 port, QStringList& list);
 
 private slots:
     void recvSktMsg();
-    void newDataGram(QString addr, QByteArray dataGram);
+    void newDataGram(QString addr, quint16 port, QByteArray dataGram);
 
 signals:
+    void newRemoteClient(RemoteClient*);
 
 public slots:
     void scanDevices();

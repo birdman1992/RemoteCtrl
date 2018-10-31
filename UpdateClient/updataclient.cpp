@@ -11,17 +11,17 @@ UpdataClient::UpdataClient(QObject *parent) : QObject(parent)
     qDebug()<<"listen 50010..";
 
     dataManager = new SpdDataGram(this);
-    connect(dataManager, SIGNAL(newDataGram(QString,QByteArray)), this, SLOT(newDataGram(QString,QByteArray)));
+    connect(dataManager, SIGNAL(newDataGram(QString,quint16,QByteArray)), this, SLOT(newDataGram(QString,quint16,QByteArray)));
 }
 
 void UpdataClient::msgBackPang()
 {
     QStringList pangParams;
-//    pangParams<<"ip"<<devNetwork->ip();
+    pangParams<<"ip"<<devNetwork->ip();
     pangParams<<"mac"<<devNetwork->macAddress();
-//    pangParams<<"mask"<<devNetwork->netmask();
-//    pangParams<<"gateway"<<devNetwork->gateway();
-    skt->writeDatagram(dataManager->find_pang(networkParams), serverAddr, serverPort);
+    pangParams<<"mask"<<devNetwork->netmask();
+    pangParams<<"gateway"<<devNetwork->gateway();
+    skt->writeDatagram(dataManager->find_pang(pangParams), serverAddr, serverPort);
 }
 
 void UpdataClient::cmdSet(QStringList &params)
@@ -44,19 +44,19 @@ void UpdataClient::cmdSetNetwork(QStringList &params)
     {
         QString param = params.takeFirst();
         QString val = params.takeFirst();
-        if(param = "ip")
+        if(param == "ip")
         {
             devNetwork->setIp(val);
         }
-        else if(param = "mac")
+        else if(param == "mac")
         {
             devNetwork->setMacAddress(val);
         }
-        else if(param = "mask")
+        else if(param == "mask")
         {
             devNetwork->setNetmask(val);
         }
-        else if(param = "gateway")
+        else if(param == "gateway")
         {
             devNetwork->setGateway(val);
         }
@@ -75,16 +75,18 @@ void UpdataClient::recvSktMsg()
 {
     quint64 dataLen = 0;
     QByteArray qba;
+
     if(skt->hasPendingDatagrams())
     {
         dataLen = skt->pendingDatagramSize();
         qba.resize(dataLen);
         skt->readDatagram(qba.data(), dataLen, &serverAddr, &serverPort);
-        dataManager->appendData(serverAddr.toString(), qba);
+        qDebug()<<"[recvSktMsg]"<<qba;
+        dataManager->appendData(serverAddr.toString(), serverPort, qba);
     }
 }
 
-void UpdataClient::newDataGram(QString addr, QByteArray dataGram)
+void UpdataClient::newDataGram(QString addr, quint16,  QByteArray dataGram)
 {
     qDebug()<<"[newDataGram]"<<addr<<dataGram;
     QStringList cmdList = QString(dataGram).split('#',  QString::SkipEmptyParts);

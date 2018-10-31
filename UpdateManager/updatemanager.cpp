@@ -7,13 +7,22 @@
 UpdateManager::UpdateManager(QObject *parent) : QObject(parent)
 {
     skt = new QUdpSocket(this);
-    skt->bind(QHostAddress::AnyIPv4, 50013);
+    skt->bind(QHostAddress::Any, 50013);
     connect(skt, SIGNAL(readyRead()), this, SLOT(recvSktMsg()));
 
     dataManager = new SpdDataGram(this);
+    connect(dataManager, SIGNAL(newDataGram(QString, quint16,QByteArray)), this, SLOT(newDataGram(QString, quint16, QByteArray)));
 
     readDeviceList();
     creatDevices(list_address);
+}
+
+//ip<<xxx<<mac<<xxx<<mask<<xxx<<gateway<<xxx
+void UpdateManager::setRemoteNetwork(RemoteClient *c)
+{
+    QStringList params;
+    params<<"ip"<<c->ip<<"mac"<<c->mac<<"mask"<<c->mask<<"gateway"<<c->gateway;
+    skt->writeDatagram(dataManager->set_network(params), QHostAddress(c->comAddr), c->comPort);
 }
 
 void UpdateManager::readDeviceList()
@@ -45,6 +54,40 @@ void UpdateManager::creatDevices(QStringList list)
     }
 }
 
+//   ip<<xxx<<mac<<xxx<<mask<<xxx<<gateway<<xxx
+void UpdateManager::msgPang(QString addr, quint16 port, QStringList& list)
+{
+    if(list.isEmpty())
+        return;
+
+    RemoteClient* client = new RemoteClient();
+
+    while(list.count() >1)
+    {
+        QString param = list.takeFirst();
+        if(param == "ip")
+        {
+            client->ip = list.takeFirst();
+        }
+        else if(param == "mac")
+        {
+            client->mac = list.takeFirst();
+        }
+        else if(param == "mask")
+        {
+            client->mask = list.takeFirst();
+        }
+        else if(param == "gateway")
+        {
+            client->gateway = list.takeFirst();
+        }
+    }
+//    list_client.insert(client->ip, client);
+    client->comAddr = addr;
+    client->comPort = port;
+    emit newRemoteClient(client);
+}
+
 void UpdateManager::recvSktMsg()
 {
     quint64 dataLen = 0;
@@ -57,7 +100,7 @@ void UpdateManager::recvSktMsg()
         dataLen = skt->pendingDatagramSize();
         qba.resize(dataLen);
         skt->readDatagram(qba.data(), dataLen, &addr, &port);
-        dataManager->appendData(addr.toString(), qba);
+        dataManager->appendData(addr.toString(), port, qba);
     }
 }
 
@@ -66,7 +109,7 @@ void UpdateManager::scanDevices()
     skt->writeDatagram(dataManager->find_ping(), QHostAddress::Broadcast, 50010);
 }
 
-void UpdateManager::newDataGram(QString addr, QByteArray dataGram)
+void UpdateManager::newDataGram(QString addr, quint16 port, QByteArray dataGram)
 {
     qDebug()<<"[newDataGram]"<<addr<<dataGram;
     QStringList cmdList = QString(dataGram).split('#',  QString::SkipEmptyParts);
@@ -76,7 +119,7 @@ void UpdateManager::newDataGram(QString addr, QByteArray dataGram)
         QString cmd = cmdList.takeFirst();
         if(cmd == "PANG")
         {
-
+            msgPang(addr, port, cmdList);
         }
     }
 }

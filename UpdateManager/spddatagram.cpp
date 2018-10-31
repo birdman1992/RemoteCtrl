@@ -6,9 +6,9 @@ SpdDataGram::SpdDataGram(QObject *parent) : QObject(parent)
 //    check_version();
 }
 
-void SpdDataGram::appendData(QString addr, QByteArray dataGram)
+void SpdDataGram::appendData(QString addr,  quint16 port, QByteArray dataGram)
 {
-    qDebug()<<"[DataGram]"<<addr<<dataGram.right(dataGram.size()-20);
+//    qDebug()<<"[DataGram]"<<addr<<dataGram.right(dataGram.size()-20);
 //    if(!dataMap.isEmpty())
     {
         QByteArray* pData = dataMap.value(addr, NULL);
@@ -36,7 +36,7 @@ void SpdDataGram::appendData(QString addr, QByteArray dataGram)
                 QByteArray qba = checkDataGram(pData->left(len));
                 if(qba.isEmpty())
                     return;
-                emit newDataGram(addr, qba);
+                emit newDataGram(addr, port, qba);
             }
             delete pData;
             dataMap.insert(addr, NULL);
@@ -67,7 +67,7 @@ QByteArray SpdDataGram::find_ping()
 QByteArray SpdDataGram::find_pang(QStringList netParams)
 {
     QStringList cmdList;
-    cmdList<<"PANG";
+    cmdList<<"PANG"<<netParams;
     QByteArray qba = creatDataGram(cmdList);
     qDebug()<<"[find_pang]"<<qba.right(qba.size()-20);
     return qba;
