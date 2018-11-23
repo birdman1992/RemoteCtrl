@@ -19,6 +19,7 @@ public:
     explicit UpdateManager(QObject *parent = NULL);
     QList<UpdateItem*> list_socket;
     void setRemoteNetwork(RemoteClient* c);
+    void sendRemoteCmd(RemoteClient* c, QStringList params);
 
 private:
     QStringList list_address;
@@ -36,6 +37,7 @@ private slots:
 
 signals:
     void newRemoteClient(RemoteClient*);
+    void newCmdReturn(QString);
 
 public slots:
     void scanDevices();

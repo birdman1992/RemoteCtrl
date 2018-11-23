@@ -19,7 +19,9 @@ public:
     QByteArray find_pang(QStringList netParams);
     QByteArray check_network();
     QByteArray set_network(QStringList params);
+    QByteArray send_cmd(QStringList params);
 
+    QByteArray back_cmd(QStringList params);
 private:
     QMap<QString, QByteArray*> dataMap;
     QByteArray checkDataGram(QByteArray qba);

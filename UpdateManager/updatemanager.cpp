@@ -25,6 +25,11 @@ void UpdateManager::setRemoteNetwork(RemoteClient *c)
     skt->writeDatagram(dataManager->set_network(params), QHostAddress(c->comAddr), c->comPort);
 }
 
+void UpdateManager::sendRemoteCmd(RemoteClient *c, QStringList params)
+{
+    skt->writeDatagram(dataManager->send_cmd(params), QHostAddress(c->comAddr), c->comPort);
+}
+
 void UpdateManager::readDeviceList()
 {
     QFile devList(qApp->applicationDirPath()+"/device.ini");
@@ -112,7 +117,7 @@ void UpdateManager::scanDevices()
 void UpdateManager::newDataGram(QString addr, quint16 port, QByteArray dataGram)
 {
     qDebug()<<"[newDataGram]"<<addr<<dataGram;
-    QStringList cmdList = QString(dataGram).split('#',  QString::SkipEmptyParts);
+    QStringList cmdList = QString::fromUtf8(dataGram).split('#',  QString::SkipEmptyParts);
 
     while(!cmdList.isEmpty())
     {
@@ -120,6 +125,10 @@ void UpdateManager::newDataGram(QString addr, quint16 port, QByteArray dataGram)
         if(cmd == "PANG")
         {
             msgPang(addr, port, cmdList);
+        }
+        else if(cmd == "CMD_BACK")
+        {
+            emit newCmdReturn(cmdList.at(0));
         }
     }
 }

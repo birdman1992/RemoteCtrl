@@ -24,8 +24,9 @@ private:
     void msgBackPang();
     void cmdSet(QStringList& params);
     void cmdSetNetwork(QStringList& params);
-
     void cmdCheck(QStringList& params);
+    void cmdExecute(QString cmd, QStringList params);
+
 
 signals:
 
@@ -34,6 +35,7 @@ public slots:
 private slots:
     void recvSktMsg();
     void newDataGram(QString addr, quint16 port, QByteArray dataGram);
+    void msgBackCmd(QByteArray qba);
 };
 
 #endif // UPDATACLIENT_H

@@ -2,6 +2,6 @@
 
 RemoteClient::RemoteClient(QObject *parent) : QObject(parent)
 {
-
+    comSkt = NULL;
 }
 

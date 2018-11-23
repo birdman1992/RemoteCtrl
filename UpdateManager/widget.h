@@ -23,6 +23,7 @@ public:
 private slots:
     void insertClinet(RemoteClient* c);
     void setRemoteNetwork(RemoteClient* c);
+    void sendRemoteCmd(RemoteClient* c, QStringList params);
 
     void on_table_clinet_doubleClicked(const QModelIndex &index);
 

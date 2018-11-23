@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QTcpSocket>
 
 class RemoteClient : public QObject
 {
@@ -17,6 +18,7 @@ public:
     QString name;
     QString comAddr; //通信地址
     quint16 comPort; //通信端口
+    QTcpSocket* comSkt;
 
 signals:
 

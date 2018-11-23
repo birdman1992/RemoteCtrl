@@ -20,10 +20,12 @@ SOURCES += \
     updataclient.cpp \
     ../UpdateManager/spddatagram.cpp \
     configmanager.cpp \
-    qnetinterface.cpp
+    qnetinterface.cpp \
+    ctrlprocess.cpp
 
 HEADERS += \
     updataclient.h \
     ../UpdateManager/spddatagram.h \
     configmanager.h \
-    qnetinterface.h
+    qnetinterface.h \
+    ctrlprocess.h

@@ -8,7 +8,7 @@ SpdDataGram::SpdDataGram(QObject *parent) : QObject(parent)
 
 void SpdDataGram::appendData(QString addr,  quint16 port, QByteArray dataGram)
 {
-//    qDebug()<<"[DataGram]"<<addr<<dataGram.right(dataGram.size()-20);
+    qDebug()<<"[DataGram]"<<addr<<dataGram.right(dataGram.size()-20);
 //    if(!dataMap.isEmpty())
     {
         QByteArray* pData = dataMap.value(addr, NULL);
@@ -26,7 +26,7 @@ void SpdDataGram::appendData(QString addr,  quint16 port, QByteArray dataGram)
 
         if(pData->at(0) == '#' && pData->at(3) == '#')
         {
-            len = (pData->at(1)<<8) + pData->at(2);
+            len = ((unsigned char)(pData->at(1))<<8) + (unsigned char)pData->at(2);
             if(pData->size()<len)
             {
                 return;
@@ -88,6 +88,24 @@ QByteArray SpdDataGram::set_network(QStringList params)
     cmdList<<"SET"<<"NETWORK"<<params;
     QByteArray qba = creatDataGram(cmdList);
     qDebug()<<"[set_network]"<<qba.right(qba.size()-20);
+    return qba;
+}
+
+QByteArray SpdDataGram::send_cmd(QStringList params)
+{
+    QStringList cmdList;
+    cmdList<<"CMD"<<params;
+    QByteArray qba = creatDataGram(cmdList);
+    qDebug()<<"[send_cmd]"<<qba.right(qba.size()-20);
+    return qba;
+}
+
+QByteArray SpdDataGram::back_cmd(QStringList params)
+{
+    QStringList cmdList;
+    cmdList<<"CMD_BACK"<<params;
+    QByteArray qba = creatDataGram(cmdList);
+    qDebug()<<"[back_cmd]"<<QString::fromUtf8(qba.right(qba.size()-20));
     return qba;
 }
 

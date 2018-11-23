@@ -38,9 +38,18 @@ void Widget::setRemoteNetwork(RemoteClient *c)
     manager->setRemoteNetwork(c);
 }
 
+void Widget::sendRemoteCmd(RemoteClient *c, QStringList params)
+{
+    manager->sendRemoteCmd(c, params);
+}
+
+
+
 void Widget::on_table_clinet_doubleClicked(const QModelIndex &index)
 {
     winRemoteConfig = new RemoteConfig(list_client.at(index.row()));
     connect(winRemoteConfig, SIGNAL(setRemoteNetwork(RemoteClient*)), this, SLOT(setRemoteNetwork(RemoteClient*)));
+    connect(winRemoteConfig, SIGNAL(remoteCmd(RemoteClient*,QStringList)), this, SLOT(sendRemoteCmd(RemoteClient*,QStringList)));
+    connect(manager, SIGNAL(newCmdReturn(QString)), winRemoteConfig, SLOT(recvRemoteCmdReturn(QString)));
     winRemoteConfig->show();
 }

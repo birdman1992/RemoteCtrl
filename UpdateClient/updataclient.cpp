@@ -1,4 +1,5 @@
 #include "updataclient.h"
+#include "ctrlprocess.h"
 
 UpdataClient::UpdataClient(QObject *parent) : QObject(parent)
 {
@@ -22,6 +23,14 @@ void UpdataClient::msgBackPang()
     pangParams<<"mask"<<devNetwork->netmask();
     pangParams<<"gateway"<<devNetwork->gateway();
     skt->writeDatagram(dataManager->find_pang(pangParams), serverAddr, serverPort);
+}
+
+void UpdataClient::msgBackCmd(QByteArray qba)
+{
+    QStringList msg;
+    msg<<QString::fromUtf8(qba);
+
+    skt->writeDatagram(dataManager->back_cmd(msg), serverAddr, serverPort);
 }
 
 void UpdataClient::cmdSet(QStringList &params)
@@ -71,6 +80,13 @@ void UpdataClient::cmdCheck(QStringList &params)
 
 }
 
+void UpdataClient::cmdExecute(QString cmd, QStringList params)
+{
+    CtrlProcess process;
+    connect(&process, SIGNAL(backMsg(QByteArray)), this, SLOT(msgBackCmd(QByteArray)));
+    process.doCmd(cmd, params);
+}
+
 void UpdataClient::recvSktMsg()
 {
     quint64 dataLen = 0;
@@ -107,6 +123,11 @@ void UpdataClient::newDataGram(QString addr, quint16,  QByteArray dataGram)
         else if(cmd == "CHECK")
         {
             cmdCheck(cmdList);
+        }
+        else if(cmd == "CMD")
+        {
+            QString cmd = cmdList.takeFirst();
+            cmdExecute(cmd, cmdList);
         }
     }
 }
